@@ -21,8 +21,21 @@ class App:
     self.listbox_pedido = Listbox(self.frame)
     self.listbox_pedido.grid(row=2, column=5)
 
-    
-    self.root.mainloop()    
+    self.atualizar_lista_menu()
+
+    self.root.mainloop()     
+
+  def atualizar_lista_menu(self):
+    self.listbox_produtos.delete(0, tk.END)
+
+    for produto, preco in self.lista_produtos.items():
+      self.listbox_produtos.insert(tk.END, f'{produto} - R${preco}')
+
+  def atualizar_lista_pedido(self):
+    self.listbox_pedido.delete(0, tk.END)
+    print(self.pedido)
+    for produto, preco in self.pedido.items():
+      self.listbox_pedido.insert(tk.END, f'{produto} - R${preco}') 
 
 if __name__ == '__main__':
   app = App()
