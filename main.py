@@ -23,6 +23,21 @@ class App:
 
     self.atualizar_lista_menu()
 
+    self.label_titulo = tk.Label(self.frame, text='Lista de produtos')
+    self.label_titulo.grid(row=1, column=0)
+
+    self.btn_criar_prod = tk.Button(self.frame, text='Novo Produto', padx=10, pady=10)
+    self.btn_criar_prod.grid(row=0, column=0, columnspan=2)
+
+    self.btn_adicionar = tk.Button(self.frame, text='Adicionar', padx=10, pady=10)
+    self.btn_adicionar.grid(row=4, column=0, columnspan=2)
+
+    self.btn_remove = tk.Button(self.frame, text='Remover',  padx=10, pady=10)
+    self.btn_remove.grid(row=4, column=2, columnspan=2)
+    
+    self.btn_confirm = tk.Button(self.frame, text='Confirmar', padx=10, pady=10)
+    self.btn_confirm.grid(row=4, column=4, columnspan=2)
+
     self.root.mainloop()     
 
   def atualizar_lista_menu(self):
