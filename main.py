@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import Listbox
+from tkinter import Listbox, messagebox, simpledialog
 
 class App:
   def __init__(self):
@@ -26,16 +26,16 @@ class App:
     self.label_titulo = tk.Label(self.frame, text='Lista de produtos')
     self.label_titulo.grid(row=1, column=0)
 
-    self.btn_criar_prod = tk.Button(self.frame, text='Novo Produto', padx=10, pady=10)
+    self.btn_criar_prod = tk.Button(self.frame, text='Novo Produto',command=self.adicionar_produto, padx=10, pady=10)
     self.btn_criar_prod.grid(row=0, column=0, columnspan=2)
 
-    self.btn_adicionar = tk.Button(self.frame, text='Adicionar', padx=10, pady=10)
+    self.btn_adicionar = tk.Button(self.frame, text='Adicionar', command=self.adicionar_ao_pedido, padx=10, pady=10)
     self.btn_adicionar.grid(row=4, column=0, columnspan=2)
 
-    self.btn_remove = tk.Button(self.frame, text='Remover',  padx=10, pady=10)
+    self.btn_remove = tk.Button(self.frame, text='Remover',  command=self.remover_do_pedido,padx=10, pady=10)
     self.btn_remove.grid(row=4, column=2, columnspan=2)
     
-    self.btn_confirm = tk.Button(self.frame, text='Confirmar', padx=10, pady=10)
+    self.btn_confirm = tk.Button(self.frame, text='Confirmar', command=self.emitir_recibo,padx=10, pady=10)
     self.btn_confirm.grid(row=4, column=4, columnspan=2)
 
     self.root.mainloop()     
@@ -52,5 +52,73 @@ class App:
     for produto, preco in self.pedido.items():
       self.listbox_pedido.insert(tk.END, f'{produto} - R${preco}') 
 
+  def adicionar_ao_pedido(self):
+      indice = self.listbox_produtos.curselection()
+      print('verificando indice:', indice)
+      if indice:
+        selecionado = self.listbox_produtos.get(indice[0]).split(' - ')
+        print(f'adicionando: {selecionado}')
+
+        chave = selecionado[0]
+        valor = float(selecionado[1].split('$')[1]) #gambiarra pra separar o R$ e armazenar apenas o valor
+
+        self.pedido[chave] = valor
+        self.atualizar_lista_pedido()
+
+      else:
+        messagebox.showerror('Nada selecionado', 'Selecione um item para adicionar!')
+
+      self.calculo_total()
+
+  def remover_do_pedido(self):
+      indice = self.listbox_pedido.curselection()
+      print('verificando indice:', indice)
+      if indice:
+        selecionado = self.listbox_pedido.get(indice[0]).split(' - ')
+        produto = selecionado[0]
+        
+        print(f'adicionando: {selecionado}')
+        to_remove = messagebox.askyesno('Remover Item', f'Deseja remover: {selecionado}')
+        print('item: ', to_remove)
+        if to_remove:
+          self.pedido.pop(produto)
+      else:
+        messagebox.showerror('Nada selecionado', 'Selecione um item para adicionar!')
+
+      self.calculo_total()
+
+  def adicionar_produto(self):
+
+    nome_produto = simpledialog.askstring("Nome do Produto", "PRODUTO",
+                                parent=self.root)
+    
+    preco_produto = simpledialog.askinteger("Preco do Produto", "PRECO", parent=self.root)
+    print(type(nome_produto))
+
+    if nome_produto and preco_produto:
+      self.lista_produtos[f'{nome_produto}'] = float(preco_produto)
+      print(self.listbox_produtos)
+      print(f'dados preenchidos, depois logica para adicionar produtos. aqui os dados: {nome_produto}, {preco_produto}')
+      self.atualizar_lista_menu()
+
+  def calculo_total(self):
+    self.atualizar_lista_pedido()
+    self.total_pedido = 0
+    for produto, valor in self.pedido.items():
+      print(f'Calculando {produto} no preco de {valor}')
+      self.total_pedido+= valor
+
+    self.label_total = tk.Label(self.frame, text=f'Total: {self.total_pedido}')
+    self.label_total.grid(row=3, column=5)
+    
+  def emitir_recibo(self):
+    pedido = ''
+    for produto, preco in self.pedido.items():
+      pedido += f'- {produto} - R$ {preco} \n'
+
+    pedido += f'TOTAL: {self.total_pedido} \n'
+
+    messagebox.showinfo('recibo', pedido)
+  
 if __name__ == '__main__':
   app = App()
