@@ -1,14 +1,18 @@
 import tkinter as tk
-from tkinter import Listbox, messagebox, simpledialog
+from tkinter import Listbox, messagebox, simpledialog, ttk
+from ttkthemes import ThemedTk
 
 class App:
   def __init__(self):
-    self.root = tk.Tk()
+    self.root = ThemedTk(theme="breeze")
     self.root.geometry('500x500')
     self.root.title('APP - Sabor Rapido')
 
-    self.frame = tk.Frame(self.root)
+    self.frame = ttk.Frame(self.root)
     self.frame.grid()
+
+    self.style = ttk.Style(self.root)
+    self.style.configure('Custom.TButton', background='blue', foreground='black', font=('Arial', 12))
 
     #dicionario temporaria
     self.lista_produtos = {"hamburguer": 10.0, "pizza": 15.0, "suco": 5.0}
@@ -16,27 +20,33 @@ class App:
     self.total_pedido = 0
 
     self.listbox_produtos = Listbox(self.frame)
-    self.listbox_produtos.grid(row=2, column=0, columnspan=2, padx=10, pady=10)
+    self.listbox_produtos.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
 
     self.listbox_pedido = Listbox(self.frame)
-    self.listbox_pedido.grid(row=2, column=5)
+    self.listbox_pedido.grid(row=3, column=5)
 
     self.atualizar_lista_menu()
 
-    self.label_titulo = tk.Label(self.frame, text='Lista de produtos')
-    self.label_titulo.grid(row=1, column=0)
+    self.label_titulo = ttk.Label(self.frame, text='Lista de produtos')
+    self.label_titulo.grid(row=2, column=0, ipadx=12, ipady=12)
 
-    self.btn_criar_prod = tk.Button(self.frame, text='Novo Produto',command=self.adicionar_produto, padx=10, pady=10)
-    self.btn_criar_prod.grid(row=0, column=0, columnspan=2)
+    self.label_hold = ttk.Label(self.frame, text="")
+    self.label_hold.grid(row=4, column=0, ipadx=25, ipady=25)
 
-    self.btn_adicionar = tk.Button(self.frame, text='Adicionar', command=self.adicionar_ao_pedido, padx=10, pady=10)
-    self.btn_adicionar.grid(row=4, column=0, columnspan=2)
+    self.label_pedido = ttk.Label(self.frame, text='Pedido:')
+    self.label_pedido.grid(row=2, column=5, ipadx=12, ipady=12)
 
-    self.btn_remove = tk.Button(self.frame, text='Remover',  command=self.remover_do_pedido,padx=10, pady=10)
-    self.btn_remove.grid(row=4, column=2, columnspan=2)
+    self.btn_criar_prod = ttk.Button(self.frame, text='Novo Produto',command=self.adicionar_produto, style='Custom.TButton')
+    self.btn_criar_prod.grid(row=0, column=0, columnspan=2, ipadx=20, ipady=20)
+
+    self.btn_adicionar = ttk.Button(self.frame, text='Adicionar', command=self.adicionar_ao_pedido, style='Custom.TButton')
+    self.btn_adicionar.grid(row=5, column=0, columnspan=2, ipadx=20, ipady=20)
+
+    self.btn_remove = ttk.Button(self.frame, text='Remover',  command=self.remover_do_pedido, style='Custom.TButton')
+    self.btn_remove.grid(row=5, column=5, columnspan=2, ipadx=20, ipady=20)
     
-    self.btn_confirm = tk.Button(self.frame, text='Confirmar', command=self.emitir_recibo,padx=10, pady=10)
-    self.btn_confirm.grid(row=4, column=4, columnspan=2)
+    self.btn_confirm = ttk.Button(self.frame, text='Confirmar', command=self.emitir_recibo, style='Custom.TButton')
+    self.btn_confirm.grid(row=0, column=5, columnspan=2, ipadx=20, ipady=20)
 
     self.root.mainloop()     
 
@@ -108,8 +118,8 @@ class App:
       print(f'Calculando {produto} no preco de {valor}')
       self.total_pedido+= valor
 
-    self.label_total = tk.Label(self.frame, text=f'Total: {self.total_pedido}')
-    self.label_total.grid(row=3, column=5)
+    self.label_total = ttk.Label(self.frame, text=f'Total: {self.total_pedido}')
+    self.label_total.grid(row=4, column=0, ipadx=25, ipady=25)
     
   def emitir_recibo(self):
     pedido = ''
