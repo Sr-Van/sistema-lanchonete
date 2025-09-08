@@ -5,8 +5,13 @@ from ttkthemes import ThemedTk
 class App:
   def __init__(self):
     self.root = ThemedTk(theme="breeze")
-    self.root.geometry('500x500')
+    self.root.attributes('-fullscreen', True)
     self.root.title('APP - Sabor Rapido')
+
+    #bind root to toogle or end fullscreen if needed
+    self.root.bind("<F11>", self.toggle_fullscreen)
+    self.root.bind("<Escape>", self.end_fullscreen)
+    self.isFullscreen = False
 
     self.frame = ttk.Frame(self.root)
     self.frame.grid()
@@ -130,5 +135,14 @@ class App:
 
     messagebox.showinfo('recibo', pedido)
   
+  def toggle_fullscreen(self, event):
+    self.isFullscreen = not self.isFullscreen
+    self.root.attributes('-fullscreen', self.isFullscreen)
+    return "break"
+  
+  def end_fullscreen(self, event):
+    self.isFullscreen = False
+    self.root.attributes('-fullscreen', self.isFullscreen)
+    return "break"
 if __name__ == '__main__':
   app = App()
