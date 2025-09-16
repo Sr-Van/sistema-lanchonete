@@ -11,6 +11,10 @@ class App:
 
     # -- binds --
     self.root.bind("<F11>", self.toggle_fullscreen)
+    self.root.bind("<Return>", self.adicionar_ao_pedido)
+    self.root.bind("<Delete>", self.remover_do_pedido)
+    self.root.bind("<F1>", self.adicionar_produto)
+    self.root.bind("<F10>", self.emitir_recibo)
     self.root.bind("<Escape>", self.end_fullscreen)
 
     # -- control vars --
@@ -98,7 +102,7 @@ class App:
     for produto, preco in self.pedido.items():
       self.listbox_pedido.insert(tk.END, f'{produto} - R${preco}') 
 
-  def adicionar_ao_pedido(self):
+  def adicionar_ao_pedido(self, event):
       indice = self.listbox_produtos.curselection()
       print('verificando indice:', indice)
       if indice:
@@ -116,7 +120,7 @@ class App:
 
       self.calculo_total()
 
-  def remover_do_pedido(self):
+  def remover_do_pedido(self, event):
       indice = self.listbox_pedido.curselection()
       print('verificando indice:', indice)
       if indice:
@@ -133,7 +137,7 @@ class App:
 
       self.calculo_total()
 
-  def adicionar_produto(self):
+  def adicionar_produto(self, event):
 
     nome_produto = simpledialog.askstring("Nome do Produto", "PRODUTO",
                                 parent=self.root)
@@ -157,7 +161,7 @@ class App:
     self.label_total.config(text=f'TOTAL: {self.total_pedido}')
     self.label_total.update_idletasks() 
     
-  def emitir_recibo(self):
+  def emitir_recibo(self, event):
     pedido = ''
     for produto, preco in self.pedido.items():
       pedido += f'- {produto} - R$ {preco} \n'
