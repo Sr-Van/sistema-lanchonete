@@ -25,6 +25,7 @@ class App:
     self.style.configure('Custom.TButton', foreground='black', font=('Arial', 16))
     self.style.configure('Custom.TFrame', background="#f0f0f0", foreground='black', font=('Arial', 16))
     self.style.configure('Custom.TLabel' ,background='#f0f0f0', foreground='black', font=('Arial', 16))
+    self.style.configure("Treeview", rowheight=35, font=('Arial', 11))
     self.custom_font = font.Font(family='Arial', size=16)
 
     # -- frames --
@@ -49,7 +50,7 @@ class App:
 
     #dicionario temporaria
     self.lista_produtos = {"hamburguer": 10.0, "pizza": 15.0, "suco": 5.0}
-    self.pedido = {}
+    self.pedido = []
     self.total_pedido = 0
 
     # -- top --
@@ -73,8 +74,12 @@ class App:
     self.label_titulo = ttk.Label(self.left_frame, text='Lista de produtos', style='Custom.TLabel')
     self.label_titulo.pack(side='top', fill='x', ipadx=25, ipady=25)
 
+    self.tree_produtos = ttk.Treeview(self.left_frame, columns=('col1', 'col2'), show='headings', height=10)
+    self.tree_produtos.pack(fill='both', expand=True, ipadx=10, ipady=10)
+    self.tree_produtos.heading('col1', text='Produto')
+    self.tree_produtos.heading('col2', text='Preco')
+
     self.listbox_produtos = Listbox(self.left_frame, width=20, height=10, bg='#ffecb7', fg='black', font=self.custom_font, selectbackground='orange', selectforeground='black', relief='ridge')
-    self.listbox_produtos.pack( fill='both', expand=True, ipadx=10, ipady=10)
 
     self.label_total = ttk.Label(self.left_frame, text=f'TOTAL: {self.total_pedido}', style='Custom.TLabel')
     self.label_total.pack(side='bottom', fill='x', ipadx=25, ipady=25)
@@ -84,54 +89,74 @@ class App:
     self.label_pedido = ttk.Label(self.right_frame, text='Pedido:', style='Custom.TLabel')
     self.label_pedido.pack(side='top', fill='x', ipadx=25, ipady=25)
 
+    self.tree_pedido = ttk.Treeview(self.right_frame, columns=('col0','col1', 'col2', 'col3'), show='headings', height=10)
+    self.tree_pedido.pack(fill='both', expand=True, ipadx=10, ipady=10)
+    self.tree_pedido.heading('col0', text='ID')
+    self.tree_pedido.heading('col1', text='Quantidade')
+    self.tree_pedido.heading('col2', text='Produto')
+    self.tree_pedido.heading('col3', text='Preço')
+
     self.listbox_pedido = Listbox(self.right_frame, width=20, height=10, bg='#ffecb7', fg='black', font=self.custom_font, selectbackground='orange', selectforeground='black', relief='ridge')
-    self.listbox_pedido.pack( fill='both', expand=True, ipadx=10, ipady=10)
 
     self.atualizar_lista_menu()
     self.root.mainloop()     
 
   def atualizar_lista_menu(self):
-    self.listbox_produtos.delete(0, tk.END)
+    for i in self.tree_produtos.get_children():
+            self.tree_produtos.delete(i)
 
     for produto, preco in self.lista_produtos.items():
-      self.listbox_produtos.insert(tk.END, f'{produto} - R${preco}')
+      self.tree_produtos.insert("", tk.END, values=(produto, preco))
 
   def atualizar_lista_pedido(self):
-    self.listbox_pedido.delete(0, tk.END)
-    print(self.pedido)
-    for produto, preco in self.pedido.items():
-      self.listbox_pedido.insert(tk.END, f'{produto} - R${preco}') 
 
-  def adicionar_ao_pedido(self, event):
-      indice = self.listbox_produtos.curselection()
+    for i in self.tree_pedido.get_children():
+            self.tree_pedido.delete(i)
+
+    for item in self.pedido:
+      iid, quantidade, produto, preco = item.values()
+      self.tree_pedido.insert("", tk.END, values=(iid, quantidade, produto, preco))
+
+  def adicionar_ao_pedido(self, event=None):
+      
+      indice = self.tree_produtos.selection()
       print('verificando indice:', indice)
-      if indice:
-        selecionado = self.listbox_produtos.get(indice[0]).split(' - ')
-        print(f'adicionando: {selecionado}')
 
-        chave = selecionado[0]
-        valor = float(selecionado[1].split('$')[1]) #gambiarra pra separar o R$ e armazenar apenas o valor
-
-        self.pedido[chave] = valor
-        self.atualizar_lista_pedido()
-
-      else:
+      if not indice:
         messagebox.showerror('Nada selecionado', 'Selecione um item para adicionar!')
+        return
+      
+      item = self.tree_produtos.item(indice[0])
+      print(item['values'])
+
+      produto = item['values'][0]
+      preco = item['values'][1]
+
+      self.pedido.append({'IID': indice[0] ,'quantidade': 1, 'produto': produto, 'preco': preco})
+      self.atualizar_lista_pedido()
+      print(self.pedido)
 
       self.calculo_total()
 
-  def remover_do_pedido(self, event):
-      indice = self.listbox_pedido.curselection()
+  def remover_do_pedido(self, event=None):
+      indice_lista = self.tree_pedido.selection()[0]
+      indice = self.tree_pedido.item(indice_lista)['values'][0]
       print('verificando indice:', indice)
       if indice:
-        selecionado = self.listbox_pedido.get(indice[0]).split(' - ')
-        produto = selecionado[0]
+        for item in self.pedido:
+          if item['IID'] == indice:
+            selecionado = f'{item["quantidade"]} - {item["produto"]} - R$ {item["preco"]}'
+            break
         
         print(f'adicionando: {selecionado}')
         to_remove = messagebox.askyesno('Remover Item', f'Deseja remover: {selecionado}')
         print('item: ', to_remove)
         if to_remove:
-          self.pedido.pop(produto)
+          for index, item in enumerate(self.pedido):
+            
+            if item['IID'] == indice:
+              self.pedido.pop(index)
+              break
       else:
         messagebox.showerror('Nada selecionado', 'Selecione um item para adicionar!')
 
@@ -154,8 +179,9 @@ class App:
   def calculo_total(self):
     self.atualizar_lista_pedido()
     self.total_pedido = 0
-    for produto, valor in self.pedido.items():
-      print(f'Calculando {produto} no preco de {valor}')
+    for item in self.pedido:
+      iid, quantidade, produto, preco = item.values()
+      valor = quantidade * float(preco)
       self.total_pedido+= valor
     
     self.label_total.config(text=f'TOTAL: {self.total_pedido}')
@@ -163,8 +189,9 @@ class App:
     
   def emitir_recibo(self, event):
     pedido = ''
-    for produto, preco in self.pedido.items():
-      pedido += f'- {produto} - R$ {preco} \n'
+    for item in self.pedido:
+      iid, quantidade, produto, preco = item.values()
+      pedido += f'{quantidade} - {produto} - R$ {preco} \n'
 
     pedido += f'TOTAL: {self.total_pedido} \n'
 
