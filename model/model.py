@@ -21,7 +21,14 @@ class Database:
     except Exception as e:
       print(e)
 
-  
+  def insert_product(self, produto, preco):
+    try:
+      self.cursor.execute("INSERT INTO produtos (produto, preco) VALUES (:produto, :preco)", {"produto": produto, "preco": preco})
+      self.conn.commit()
+      print("Produto inserido com sucesso!")
+    except Exception as e:
+      print(e)
 
 if __name__ == "__main__":
-  Database()
+  db = Database()
+  db.insert_product("Produto 3", 10.99)
