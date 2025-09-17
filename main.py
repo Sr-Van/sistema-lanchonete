@@ -122,6 +122,8 @@ class App:
       indice = self.tree_produtos.selection()
       print('verificando indice:', indice)
 
+      if self.item_existe(indice[0]):
+        return
       if not indice:
         messagebox.showerror('Nada selecionado', 'Selecione um item para adicionar!')
         return
@@ -176,6 +178,15 @@ class App:
       print(f'dados preenchidos, depois logica para adicionar produtos. aqui os dados: {nome_produto}, {preco_produto}')
       self.atualizar_lista_menu()
 
+  def item_existe(self, index):
+     for item in self.pedido:
+      if item['IID'] == index:
+        item['quantidade'] += 1
+        self.calculo_total()
+        return True
+
+     return False
+      
   def calculo_total(self):
     self.atualizar_lista_pedido()
     self.total_pedido = 0
@@ -191,7 +202,7 @@ class App:
     pedido = ''
     for item in self.pedido:
       iid, quantidade, produto, preco = item.values()
-      pedido += f'{quantidade} - {produto} - R$ {preco} \n'
+      pedido += f'{quantidade} - {produto} - R$ {(quantidade * float(preco))} \n'
 
     pedido += f'TOTAL: {self.total_pedido} \n'
 
