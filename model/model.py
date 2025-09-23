@@ -1,12 +1,11 @@
 import sqlite3
 
-
 class Database:
-  def __init__(self, db_name):
-    self.conn = sqlite3.connect(db_name)
+  def __init__(self, conn):
+    self.conn = conn
     self.cursor = self.conn.cursor()
+    print("Conexão com o banco de dados estabelecida com sucesso!")
     self.create_table()
-    self.conn.close()
 
   def create_table(self):
     try:
@@ -25,8 +24,10 @@ class Database:
       self.cursor.execute("INSERT INTO produtos (produto, preco) VALUES (:produto, :preco)", {"produto": produto, "preco": preco})
       self.conn.commit()
       print("Produto inserido com sucesso!")
+      return True
     except Exception as e:
       print(e)
+      return False
 
   def get_products(self):
     try:
@@ -35,5 +36,3 @@ class Database:
 
     except sqlite3.Error as e:
       print(f'Erro ao buscar produtos: {e}')
-if __name__ == "__main__":
-  db = Database('./database.db')
