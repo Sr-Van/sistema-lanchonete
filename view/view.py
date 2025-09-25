@@ -211,7 +211,12 @@ class App:
     pedido += f'TOTAL: {self.total_pedido} \n'
 
     messagebox.showinfo('recibo', pedido)
+    self.encerrar_pedido()
   
+  def encerrar_pedido(self):
+    self.pedido = []
+    self.total_pedido = 0
+    self.calculo_total()
   def toggle_fullscreen(self, event):
     self.isFullscreen = not self.isFullscreen
     self.root.attributes('-fullscreen', self.isFullscreen)
