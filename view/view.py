@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import Listbox, messagebox, simpledialog, ttk, font
 from ttkthemes import ThemedTk
+from view.modal import Recibo
 
 class App:
   def __init__(self, controller):
@@ -104,6 +105,7 @@ class App:
     self.root.mainloop()     
 
   def atualizar_lista_menu(self):
+    primeiro_item = None
     self.lista_produtos = []
     self.lista_produtos = self.controller.pegar_produtos()
     print(self.lista_produtos)
@@ -111,7 +113,16 @@ class App:
             self.tree_produtos.delete(i)
 
     for produto, preco in self.lista_produtos.items():
-      self.tree_produtos.insert("", tk.END, values=(produto, preco))
+      item = self.tree_produtos.insert("", tk.END, values=(produto, preco))
+
+      if primeiro_item is None:
+         primeiro_item = item
+    
+    if primeiro_item:
+      self.tree_produtos.selection_set(primeiro_item)
+      self.tree_produtos.focus(primeiro_item)
+
+    self.tree_produtos.focus_set()
 
   def atualizar_lista_pedido(self):
 
@@ -202,15 +213,9 @@ class App:
     self.label_total.config(text=f'TOTAL: {self.total_pedido}')
     self.label_total.update_idletasks() 
     
-  def emitir_recibo(self, event):
-    pedido = ''
-    for item in self.pedido:
-      iid, quantidade, produto, preco = item.values()
-      pedido += f'{quantidade} - {produto} - R$ {(quantidade * float(preco))} \n'
-
-    pedido += f'TOTAL: {self.total_pedido} \n'
-
-    messagebox.showinfo('recibo', pedido)
+  def emitir_recibo(self, event=None):
+    modal = Recibo(self.root, self.pedido, title='RECIBO', total=self.total_pedido)
+    self.root.wait_window(modal)
     self.encerrar_pedido()
   
   def encerrar_pedido(self):
