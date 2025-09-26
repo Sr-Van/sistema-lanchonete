@@ -49,3 +49,49 @@ class Recibo(tkinter.Toplevel):
       tree.insert("", tkinter.END, values=(quantidade, produto, preco))
 
 
+class Novo(tkinter.Toplevel):
+  def __init__(self, parent, controller,title = None):
+    super().__init__(parent)
+    self.title(title)
+    self.parent = parent
+    self.controller = controller
+
+    self.frame = ttk.Frame(self)
+    self.frame.pack(expand=True, fill='both', ipadx=10, ipady=10)
+
+    self.grab_set()
+    self.focus_set()
+
+    self.largura_modal = 500
+    self.altura_modal = 300
+    self.largura_tela = self.parent.winfo_screenwidth()
+    self.altura_tela = self.parent.winfo_screenheight()
+    
+    self.pos_x = (self.largura_tela // 2) - (self.largura_modal // 2)
+    self.pos_y = (self.altura_tela // 2) - (self.altura_modal // 2)
+    
+    self.geometry(f'{self.largura_modal}x{self.altura_modal}+{self.pos_x}+{self.pos_y}')
+
+    self.label_produto = ttk.Label(self.frame, text='Nome produto', font=('Arial', 16))
+    self.label_produto.pack(padx=10, pady=10, expand=True, fill='both')
+
+    self.entry_produto = ttk.Entry(self.frame, font=('Arial', 16))
+    self.entry_produto.pack(padx=10, pady=10, expand=True, fill='both')
+    self.entry_produto.focus_set()
+
+    self.label_preco = ttk.Label(self.frame, text='Preço', font=('Arial', 16))
+    self.label_preco.pack(padx=10, pady=10, expand=True, fill='both')
+
+    self.entry_preco = ttk.Entry(self.frame, font=('Arial', 16))
+    self.entry_preco.pack(padx=10, pady=10, expand=True, fill='both')
+
+    self.button_ok = ttk.Button(self.frame, text='Confirmar', command=self.salvar_produto)
+    self.button_ok.pack(padx=10, pady=10, expand=True, fill='both')
+
+  def salvar_produto(self):
+    print('dados preenchidos, depois logica para adicionar produtos. aqui os dados:', self.entry_produto.get(), self.entry_preco.get())
+    if self.controller.adicionar_produto(self.entry_produto.get(), float(self.entry_preco.get())):
+      print('adicionado com sucesso')
+      self.destroy()
+
+

@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import Listbox, messagebox, simpledialog, ttk, font
 from ttkthemes import ThemedTk
-from view.modal import Recibo
+from view.modal import Recibo, Novo
 
 class App:
   def __init__(self, controller):
@@ -181,17 +181,9 @@ class App:
       self.calculo_total()
 
   def adicionar_produto(self, event=None):
-
-    nome_produto = simpledialog.askstring("Nome do Produto", "PRODUTO",
-                                parent=self.root)
-    
-    preco_produto = simpledialog.askfloat("Preco do Produto", "PRECO", parent=self.root)
-    print(type(nome_produto))
-
-    if nome_produto and preco_produto:
-      if self.controller.adicionar_produto(nome_produto, preco_produto):
-         self.atualizar_lista_menu()
-         print(f'dados preenchidos, depois logica para adicionar produtos. aqui os dados: {nome_produto}, {preco_produto}')
+    novo_produto = Novo(self.root, title='NOVO PRODUTO', controller=self.controller)
+    self.root.wait_window(novo_produto)
+    self.atualizar_lista_menu()
 
   def item_existe(self, index):
      for item in self.pedido:
